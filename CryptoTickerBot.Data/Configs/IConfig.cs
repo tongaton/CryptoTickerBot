@@ -1,19 +1,19 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace CryptoTickerBot.Data.Configs
 {
-	public interface IConfig<out TConfig> where TConfig : IConfig<TConfig>
-	{
-		[JsonIgnore]
-		string ConfigFileName { get; }
+    public interface IConfig<out TConfig> where TConfig : IConfig<TConfig>
+    {
+        [JsonIgnore]
+        string ConfigFileName { get; }
 
-		[JsonIgnore]
-		string ConfigFolderName { get; }
+        [JsonIgnore]
+        string ConfigFolderName { get; }
 
-		bool TryValidate ( out IList<Exception> exceptions );
+        bool TryValidate(out IList<Exception> exceptions);
 
-		TConfig RestoreDefaults ( );
-	}
+        TConfig RestoreDefaults();
+    }
 }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28407.52
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35208.52
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoTickerBot.Core", "CryptoTickerBot.Core\CryptoTickerBot.Core.csproj", "{636F1BD4-24ED-419F-89D6-C16E20239E41}"
 EndProject
@@ -22,6 +22,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoTickerBot.Arbitrage", "CryptoTickerBot.Arbitrage\CryptoTickerBot.Arbitrage.csproj", "{A2D33E0F-684E-40DC-AEDD-9622EA801020}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoTickerBot.UnitTests", "CryptoTickerBot.UnitTests\CryptoTickerBot.UnitTests.csproj", "{364A7188-1A01-416F-B2A4-460C8ACE856A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CryptoTickerBotAPI", "CryptoTickerBotAPI", "{00521527-05DF-4B39-A2FB-29D874282AB1}"
+	ProjectSection(SolutionItems) = preProject
+		launch.json = launch.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

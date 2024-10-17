@@ -1,24 +1,24 @@
-﻿using System;
-using CryptoTickerBot.Data.Domain;
+﻿using CryptoTickerBot.Data.Domain;
 using Newtonsoft.Json;
+using System;
 
 namespace CryptoTickerBot.Core.Interfaces
 {
-	public interface ICryptoExchangeSubscription :
-		IDisposable,
-		IObserver<CryptoCoin>,
-		IEquatable<ICryptoExchangeSubscription>
-	{
-		Guid Id { get; }
+    public interface ICryptoExchangeSubscription :
+        IDisposable,
+        IObserver<CryptoCoin>,
+        IEquatable<ICryptoExchangeSubscription>
+    {
+        Guid Id { get; }
 
-		[JsonIgnore]
-		ICryptoExchange Exchange { get; }
+        [JsonIgnore]
+        ICryptoExchange Exchange { get; }
 
-		DateTime CreationTime { get; }
+        DateTime CreationTime { get; }
 
-		[JsonIgnore]
-		TimeSpan ActiveSince { get; }
+        [JsonIgnore]
+        TimeSpan ActiveSince { get; }
 
-		void Stop ( );
-	}
+        void Stop();
+    }
 }
