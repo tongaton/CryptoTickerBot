@@ -1,0 +1,20 @@
+{
+  "TICKER": [
+    {
+      "QueryName": "GET_TICKER_HISTORY",
+      "QueryString": "exec ps_gdl_get_documents_lg @quantityDay, @vou_code"
+    }
+  ],
+  "TRANSACTION": [
+    {
+      "QueryName": "PS_INSERT_TRANSACTIONS",
+      "QueryString": "exec pi_tnm_transacciones_nuevo_mantenimiento_flota @id_br ,@comercio, @cliente, @subcuenta, @patente,@mano_obra, @mano_obra_sin_impuestos, @materiales, @materiales_sin_impuestos, @fecha_de_transaccion, @centrocosto, @tra_watts_event_id"
+    }
+  ],
+  "BASE": [
+    {
+      "QueryName": "PI_BNM_BASE_NUEVO_MANTENIMIENTO_FLOTA",
+      "QueryString": "exec pi_bnm_base_nuevo_mantenimiento_flota  @cliente, @subcuenta"
+    }
+  ]
+}

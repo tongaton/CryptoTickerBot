@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,8 +16,11 @@
     <PackageReference Include="NLog.Config" Version="4.5.11" />
     <PackageReference Include="Polly" Version="6.1.2" />
     <PackageReference Include="SharpRaven" Version="2.4.0" />
-    <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
+    <PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
     <PackageReference Include="Tababular" Version="3.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,9 +28,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Erky-queries.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  
+    <ItemGroup>
     <None Update="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  
+    <ItemGroup>
+      <Folder Include="Model\" />
+    </ItemGroup>
 
 </Project>
