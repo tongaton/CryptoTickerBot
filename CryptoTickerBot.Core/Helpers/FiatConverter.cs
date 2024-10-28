@@ -1,4 +1,8 @@
-﻿using System;
+﻿using CryptoTickerBot.Data.Configs;
+using Newtonsoft.Json;
+using NLog;
+using Polly;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
@@ -6,142 +10,141 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
-using CryptoTickerBot.Data.Configs;
-using CryptoTickerBot.Data.Extensions;
-using Flurl.Http;
-using Newtonsoft.Json;
-using NLog;
-using Polly;
 
 namespace CryptoTickerBot.Core.Helpers
 {
-	public static class FiatConverter
-	{
-		public static readonly string TickerUrl = "http://data.fixer.io/api/latest";
-		private static readonly Logger Logger = LogManager.GetCurrentClassLogger ( );
+    public static class FiatConverter
+    {
+        public static readonly string TickerUrl = "http://data.fixer.io/api/latest";
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-		private static readonly IDictionary<string, RegionInfo> Map;
+        private static readonly IDictionary<string, RegionInfo> Map;
 
-		public static Dictionary<string, decimal> UsdTo { get; private set; } =
-			new Dictionary<string, decimal> ( );
+        public static Dictionary<string, decimal> UsdTo { get; private set; } =
+            new Dictionary<string, decimal>();
 
-		public static bool IsRunning { get; private set; }
-		public static Timer Timer { get; private set; }
-		public static Policy Policy { get; set; }
+        public static bool IsRunning { get; private set; }
+        public static Timer Timer { get; private set; }
+        public static Policy Policy { get; set; }
 
-		static FiatConverter ( )
-		{
-			Map = CultureInfo
-				.GetCultures ( CultureTypes.AllCultures )
-				.Where ( c => !c.IsNeutralCulture )
-				.Select ( culture =>
-				{
-					try
-					{
-						return new RegionInfo ( culture.LCID );
-					}
-					catch
-					{
-						return null;
-					}
-				} )
-				.Where (
-					ri => ri != null )
-				.GroupBy ( ri => ri.ISOCurrencySymbol )
-				.OrderBy ( x => x.Key )
-				.ToDictionary (
-					x => x.Key,
-					x => x.First ( )
-				);
+        static FiatConverter()
+        {
+            Map = CultureInfo
+                .GetCultures(CultureTypes.AllCultures)
+                .Where(c => !c.IsNeutralCulture)
+                .Select(culture =>
+                {
+                    try
+                    {
+                        return new RegionInfo(culture.LCID);
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                })
+                .Where(
+                    ri => ri != null)
+                .GroupBy(ri => ri.ISOCurrencySymbol)
+                .OrderBy(x => x.Key)
+                .ToDictionary(
+                    x => x.Key,
+                    x => x.First()
+                );
 
-			TickerUrl += $"?access_key={ConfigManager<CoreConfig>.Instance.FixerApiKey}";
-			TickerUrl += "&symbols=" + Map.Keys.Join ( "," );
+            TickerUrl += $"?access_key={ConfigManager<CoreConfig>.Instance.FixerApiKey}";
+            //TickerUrl += "&symbols=" + Map.Keys.Join ( "," );
+            // Solo elijo ARS - EUR - USE
+            TickerUrl += "&symbols=" + "ARS,EUR;USD";
 
-			Policy = Policy
-				.Handle<Exception> ( )
-				.WaitAndRetryAsync ( 5,
-				                     x => TimeSpan.FromSeconds ( 1 << x ),
-				                     ( exception,
-				                       span,
-				                       retryCount,
-				                       ctx ) => Logger.Error ( exception, $"Retry attemp #{retryCount}" ) );
-		}
 
-		public static async Task<Timer> StartMonitorAsync ( )
-		{
-			if ( IsRunning )
-				return Timer;
-			IsRunning = true;
+            Policy = Policy
+    .Handle<Exception>()
+    .WaitAndRetryAsync(5,
+                         x => TimeSpan.FromSeconds(1 << x),
+                         (exception,
+                           span,
+                           retryCount,
+                           ctx) => Logger.Error(exception, $"Retry attemp #{retryCount}"));
+        }
 
-			Timer = new Timer ( TimeSpan.FromDays ( 1 ).TotalMilliseconds );
-			Timer.Disposed += ( sender,
-			                    args ) => IsRunning = false;
+        public static async Task<Timer> StartMonitorAsync()
+        {
+            if (IsRunning)
+                return Timer;
+            IsRunning = true;
 
-			await TryFetchRatesAsync ( ).ConfigureAwait ( false );
+            Timer = new Timer(TimeSpan.FromDays(1).TotalMilliseconds);
+            Timer.Disposed += (sender,
+                                args) => IsRunning = false;
 
-			Timer.Elapsed += ( sender,
-			                   args ) =>
-				Task.Run ( async ( ) => await TryFetchRatesAsync ( ).ConfigureAwait ( false ) );
-			Timer.Start ( );
+            await TryFetchRatesAsync().ConfigureAwait(false);
 
-			return Timer;
-		}
+            Timer.Elapsed += (sender,
+                               args) =>
+                Task.Run(async () => await TryFetchRatesAsync().ConfigureAwait(false));
+            Timer.Start();
 
-		public static void StopMonitor ( )
-		{
-			Timer?.Stop ( );
-			Timer?.Dispose ( );
-		}
+            return Timer;
+        }
 
-		public static async Task TryFetchRatesAsync ( )
-		{
-			try
-			{
-				await Policy.ExecuteAsync ( FetchRatesAsync ).ConfigureAwait ( false );
-			}
-			catch ( Exception e )
-			{
-				Logger.Error ( e );
-				throw;
-			}
-		}
+        public static void StopMonitor()
+        {
+            Timer?.Stop();
+            Timer?.Dispose();
+        }
 
-		private static async Task FetchRatesAsync ( )
-		{
-			var json = await TickerUrl.GetStringAsync ( ).ConfigureAwait ( false );
-			var data = JsonConvert.DeserializeObject<dynamic> ( json );
-			UsdTo =
-				JsonConvert.DeserializeObject<Dictionary<string, decimal>> ( data.rates.ToString ( ) );
+        public static async Task TryFetchRatesAsync()
+        {
+            try
+            {
+                await Policy.ExecuteAsync(FetchRatesAsync).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e);
+                throw;
+            }
+        }
 
-			var factor = UsdTo["USD"];
-			var symbols = UsdTo.Keys.ToList ( );
-			foreach ( var fiat in symbols )
-				UsdTo[fiat] = Math.Round ( UsdTo[fiat] / factor, 2 );
-			UsdTo["USD"] = 1m;
+        private static async Task FetchRatesAsync()
+        {
+            //var json = await TickerUrl.GetStringAsync ( ).ConfigureAwait ( false );
+            // Hardcoded response
+            var json = "{'success': true, 'timestamp': 1728382641, 'base': 'EUR', 'date': '2024-10-08', 'rates': {'ARS': 1051.076682,'EUR': 1,'USD': 1.118644}}";
+            var data = JsonConvert.DeserializeObject<dynamic>(json);
+            UsdTo =
+                JsonConvert.DeserializeObject<Dictionary<string, decimal>>(data.rates.ToString());
 
-			Logger.Info ( $"Fetched Fiat currency rates for {UsdTo.Count} symbols." );
-		}
+            var factor = UsdTo["USD"];
+            var symbols = UsdTo.Keys.ToList();
+            foreach (var fiat in symbols)
+                UsdTo[fiat] = Math.Round(UsdTo[fiat] / factor, 2);
+            UsdTo["USD"] = 1m;
 
-		public static Dictionary<string, RegionInfo> GetSymbols ( ) =>
-			new Dictionary<string, RegionInfo> ( Map );
+            Logger.Info($"Fetched Fiat currency rates for {UsdTo.Count} symbols.");
+        }
 
-		[DebuggerStepThrough]
-		[Pure]
-		public static decimal Convert ( decimal amount,
-		                                string from,
-		                                string to ) =>
-			amount * UsdTo[to] / UsdTo[from];
+        public static Dictionary<string, RegionInfo> GetSymbols() =>
+            new Dictionary<string, RegionInfo>(Map);
 
-		[DebuggerStepThrough]
-		[Pure]
-		public static string ToString ( decimal amount,
-		                                string from,
-		                                string to )
-		{
-			var result = Convert ( amount, from, to );
-			var symbol = Map[to];
+        [DebuggerStepThrough]
+        [Pure]
+        public static decimal Convert(decimal amount,
+                                        string from,
+                                        string to) =>
+            amount * UsdTo[to] / UsdTo[from];
 
-			return $"{symbol.CurrencySymbol}{result:N}";
-		}
-	}
+        [DebuggerStepThrough]
+        [Pure]
+        public static string ToString(decimal amount,
+                                        string from,
+                                        string to)
+        {
+            var result = Convert(amount, from, to);
+            var symbol = Map[to];
+
+            return $"{symbol.CurrencySymbol}{result:N}";
+        }
+    }
 }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28407.52
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35208.52
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoTickerBot.Core", "CryptoTickerBot.Core\CryptoTickerBot.Core.csproj", "{636F1BD4-24ED-419F-89D6-C16E20239E41}"
 EndProject
@@ -21,7 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoTickerBot.Telegram", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoTickerBot.Arbitrage", "CryptoTickerBot.Arbitrage\CryptoTickerBot.Arbitrage.csproj", "{A2D33E0F-684E-40DC-AEDD-9622EA801020}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoTickerBot.UnitTests", "CryptoTickerBot.UnitTests\CryptoTickerBot.UnitTests.csproj", "{364A7188-1A01-416F-B2A4-460C8ACE856A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoTickerBot.UnitTests", "CryptoTickerBot.UnitTests\CryptoTickerBot.UnitTests.csproj", "{364A7188-1A01-416F-B2A4-460C8ACE856A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoTickerBot.API", "CryptoTickerBot.API\CryptoTickerBot.API.csproj", "{E7E98AFC-93A1-4F40-B784-ED0ABE07A6A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +71,10 @@ Global
 		{364A7188-1A01-416F-B2A4-460C8ACE856A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{364A7188-1A01-416F-B2A4-460C8ACE856A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{364A7188-1A01-416F-B2A4-460C8ACE856A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7E98AFC-93A1-4F40-B784-ED0ABE07A6A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7E98AFC-93A1-4F40-B784-ED0ABE07A6A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7E98AFC-93A1-4F40-B784-ED0ABE07A6A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7E98AFC-93A1-4F40-B784-ED0ABE07A6A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
