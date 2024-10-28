@@ -1,12 +1,15 @@
 ﻿using System;
+using CryptoTickerBot.Data.Domain.CryptoTicker;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CryptoTickerBot.Data.Contracts
 {
     public interface ICryptoTickerHistoryRepository
     {
-        void GetTickerHistory(int ClientID, int subCount, string externalKey);
-
+        public Task<List<CryptoTicker>> Top10Ticker();
+        public Task<List<CryptoTicker>> GetTickerHistories(DateTime fromDate, DateTime toDate, string ticker, string klines);
+        public void UpdateOrInsertTickerHistory(DateTime timestamp, string ticker, string klines, decimal price);
     }
 }

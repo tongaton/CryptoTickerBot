@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoTickerBot.Arbitrage",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoTickerBot.UnitTests", "CryptoTickerBot.UnitTests\CryptoTickerBot.UnitTests.csproj", "{364A7188-1A01-416F-B2A4-460C8ACE856A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoTicketBot.API", "CryptoTicketBotAPI\CryptoTicketBot.API.csproj", "{E7E98AFC-93A1-4F40-B784-ED0ABE07A6A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoTickerBot.API", "CryptoTickerBot.API\CryptoTickerBot.API.csproj", "{E7E98AFC-93A1-4F40-B784-ED0ABE07A6A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

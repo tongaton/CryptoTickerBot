@@ -6,9 +6,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/CryptoTickerBotAPI/bin/Debug/net5.0/CryptoTickerBotDB.dll",
+            "program": "${workspaceFolder}/CryptoTickerBot.API/bin/Debug/net5.0/CryptoTickerBotDB.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/CryptoTickerBotAPI",
+            "cwd": "${workspaceFolder}/CryptoTickerBot.API",
             "stopAtEntry": false,
             "serverReadyAction": {
                 "action": "openExternally",

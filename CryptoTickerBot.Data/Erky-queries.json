@@ -2,19 +2,15 @@
   "TICKER": [
     {
       "QueryName": "GET_TICKER_HISTORY",
-      "QueryString": "exec ps_gdl_get_documents_lg @quantityDay, @vou_code"
-    }
-  ],
-  "TRANSACTION": [
+      "QueryString": "exec ps_get_ticker_history @date_from, @date_to, @ticker, @klines"
+    },
     {
-      "QueryName": "PS_INSERT_TRANSACTIONS",
-      "QueryString": "exec pi_tnm_transacciones_nuevo_mantenimiento_flota @id_br ,@comercio, @cliente, @subcuenta, @patente,@mano_obra, @mano_obra_sin_impuestos, @materiales, @materiales_sin_impuestos, @fecha_de_transaccion, @centrocosto, @tra_watts_event_id"
-    }
-  ],
-  "BASE": [
+      "QueryName": "UPDATE_OR_INSERT_TICKER_HISTORY",
+      "QueryString": "exec pui_ticker_history @ticker, @kline, @price"
+    },
     {
-      "QueryName": "PI_BNM_BASE_NUEVO_MANTENIMIENTO_FLOTA",
-      "QueryString": "exec pi_bnm_base_nuevo_mantenimiento_flota  @cliente, @subcuenta"
+      "QueryName": "TOP_10_TICKER",
+      "QueryString": "SELECT TOP 10 [ticker_history_id], [ticker],[price],[klines_name],[ticker_date],[EMA7],[EMA25],[EMA99] FROM [Erky].[dbo].[ticker_history] th INNER JOIN [dbo].[klines] k ON k.klines_id = th.klines_id"
     }
   ]
 }
