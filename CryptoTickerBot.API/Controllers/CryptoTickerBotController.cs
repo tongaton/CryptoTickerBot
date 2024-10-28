@@ -32,8 +32,8 @@ namespace CryptoTickerBot.API.Controllers
         {
             try
             {
-                List<CryptoTicker> cryptoHistory = await CryptoTickerHistoryRepository.Top10Ticker();
-                //List<CryptoTicker> cryptoHistory = await CryptoTickerHistoryRepository.GetTickerHistories(fromDate, toDate, ticker, klines);
+                //List<CryptoTicker> cryptoHistory = await CryptoTickerHistoryRepository.Top10Ticker();
+                List<CryptoTicker> cryptoHistory = await CryptoTickerHistoryRepository.GetTickerHistories(fromDate, toDate, ticker, klines);
 
                 return cryptoHistory;
             }
