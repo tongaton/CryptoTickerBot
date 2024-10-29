@@ -10,6 +10,6 @@ namespace CryptoTickerBot.Data.Contracts
     {
         public Task<List<CryptoTicker>> Top10Ticker();
         public Task<List<CryptoTicker>> GetTickerHistories(DateTime fromDate, DateTime toDate, string ticker, string klines);
-        public void UpdateOrInsertTickerHistory(DateTime timestamp, string ticker, string klines, decimal price);
+        public Task InsertOrUpdateTickerHistory(DateTime timestamp, string ticker, string klines, decimal price);
     }
 }

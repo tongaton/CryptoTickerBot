@@ -10,12 +10,12 @@ namespace CryptoTickerBot.Data.Helpers
         public const string TICKER = "TICKER";
 
         //Query names
-        public const string GET_TICKER_HISTORY = "GET_TICKER_HISTORY";
+        public const string GET_TICKER_HISTORY_LIST = "GET_TICKER_HISTORY_LIST";
 
         //TOP 10 TICKER 
         public const string TOP_10_TICKER = "TOP_10_TICKER";
 
         //Insert or update history
-        public const string UPDATE_OR_INSERT_TICKER_HISTORY = "UPDATE_OR_INSERT_TICKER_HISTORY";
+        public const string INSERT_OR_UPDATE_TICKER_HISTORY = "INSERT_OR_UPDATE_TICKER_HISTORY";
     }
 }

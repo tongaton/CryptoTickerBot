@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CryptoTickerBot.API.Controllers
 {
@@ -43,6 +44,22 @@ namespace CryptoTickerBot.API.Controllers
                 throw ex;
             }
 
+        }
+
+        [HttpPost]
+        public async Task InsertOrUpdateTickerHistory(DateTime timestamp, string ticker, string klines, decimal price)
+        {
+            try
+            {
+
+                await CryptoTickerHistoryRepository.InsertOrUpdateTickerHistory(timestamp,ticker, klines, price);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while inserting or updating Ticket History");
+                throw;
+            }
         }
     }
 }
