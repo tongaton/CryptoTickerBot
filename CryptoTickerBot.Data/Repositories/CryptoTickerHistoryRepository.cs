@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using static CryptoTickerBot.Data.Helpers.DbQueryReader;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CryptoTickerBot.Data.Repositories
 {
@@ -34,7 +35,7 @@ namespace CryptoTickerBot.Data.Repositories
         {
             try
             {
-                string query = DbQueryReader.GetInstance().GetQuery(Enum.GetName(typeof(DbNames), DbNames.Erky), ErkyQueryReference.TICKER, ErkyQueryReference.GET_TICKER_HISTORY);
+                string query = DbQueryReader.GetInstance().GetQuery(Enum.GetName(typeof(DbNames), DbNames.Erky), ErkyQueryReference.TICKER, ErkyQueryReference.GET_TICKER_HISTORY_LIST);
 
                 List<CryptoTicker> tickerList = await _cryptoTickerContext.CryptoTickerHistory.FromSqlRaw(query, 
                     new SqlParameter[] { 
@@ -49,16 +50,23 @@ namespace CryptoTickerBot.Data.Repositories
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while updating Cliente external key");
-                throw e;
+                throw;
             }
 
         }
 
-        public void UpdateOrInsertTickerHistory(DateTime timestamp, string ticker, string kline, decimal price) 
+        public async Task InsertOrUpdateTickerHistory(DateTime timestamp, string ticker, string klines, decimal price) 
         {
             try
             {
-                string query = DbQueryReader.GetInstance().GetQuery(Enum.GetName(typeof(DbNames), DbNames.Erky), ErkyQueryReference.TICKER, ErkyQueryReference.UPDATE_OR_INSERT_TICKER_HISTORY);
+                string query = DbQueryReader.GetInstance().GetQuery(Enum.GetName(typeof(DbNames), DbNames.Erky), ErkyQueryReference.TICKER, ErkyQueryReference.INSERT_OR_UPDATE_TICKER_HISTORY);
+                
+                await _cryptoTickerContext.Database.ExecuteSqlRawAsync(query,
+                    new SqlParameter("@timestamp", timestamp),
+                    new SqlParameter("@ticker", ticker),
+                    new SqlParameter("@price", price),
+                    new SqlParameter("@klines", klines)
+                );
             }
             catch (Exception e)
             {

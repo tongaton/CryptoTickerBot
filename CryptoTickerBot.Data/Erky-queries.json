@@ -1,12 +1,12 @@
 {
   "TICKER": [
     {
-      "QueryName": "GET_TICKER_HISTORY",
-      "QueryString": "exec ps_get_ticker_history @date_from, @date_to, @ticker, @klines"
+      "QueryName": "GET_TICKER_HISTORY_LIST",
+      "QueryString": "exec ps_get_ticker_history_list @date_from, @date_to, @ticker, @klines"
     },
     {
-      "QueryName": "UPDATE_OR_INSERT_TICKER_HISTORY",
-      "QueryString": "exec pui_ticker_history @ticker, @kline, @price"
+      "QueryName": "INSERT_OR_UPDATE_TICKER_HISTORY",
+      "QueryString": "exec pui_ticker_history @timestamp, @ticker, @klines, @price"
     },
     {
       "QueryName": "TOP_10_TICKER",
