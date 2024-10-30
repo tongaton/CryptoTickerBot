@@ -6,7 +6,7 @@
     <ProjectGuid>a45ad2df-2303-441c-bf59-9b48f0e857f5</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}</DockerServiceUrl>
-    <DockerServiceName>edenred.ar.fleetmanagement.internalapi.api</DockerServiceName>
+    <DockerServiceName>cryptotickerbot.api</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">

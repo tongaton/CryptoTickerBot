@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoTickerBot.UnitTests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoTickerBot.API", "CryptoTickerBot.API\CryptoTickerBot.API.csproj", "{E7E98AFC-93A1-4F40-B784-ED0ABE07A6A9}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{A45AD2DF-2303-441C-BF59-9B48F0E857F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{E7E98AFC-93A1-4F40-B784-ED0ABE07A6A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7E98AFC-93A1-4F40-B784-ED0ABE07A6A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7E98AFC-93A1-4F40-B784-ED0ABE07A6A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A45AD2DF-2303-441C-BF59-9B48F0E857F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A45AD2DF-2303-441C-BF59-9B48F0E857F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A45AD2DF-2303-441C-BF59-9B48F0E857F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A45AD2DF-2303-441C-BF59-9B48F0E857F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

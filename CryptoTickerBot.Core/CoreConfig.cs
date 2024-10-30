@@ -29,6 +29,7 @@ namespace CryptoTickerBot.Core
                 TickerUrl      = "wss://stream2.binance.com:9443/ws/!ticker@arr",
                 BuyFees        = 0.1m,
                 SellFees       = 0.1m,
+                InternalAPI    = "http://localhost:4043/API",
                 PollingRate    = TimeSpan.FromMilliseconds ( 1000 ),
                 CooldownPeriod = TimeSpan.FromSeconds ( 5 ),
                 SymbolMappings = new Dictionary<string, string>
@@ -166,6 +167,7 @@ namespace CryptoTickerBot.Core
             public string Url { get; set; }
 
             public string TickerUrl { get; set; }
+            public string InternalAPI { get; set; }
 
             public Dictionary<string, string> SymbolMappings { get; set; } =
                 new Dictionary<string, string>();

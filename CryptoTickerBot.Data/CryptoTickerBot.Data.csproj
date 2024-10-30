@@ -33,14 +33,15 @@
     </EmbeddedResource>
   </ItemGroup>
   
-    <ItemGroup>
+  <ItemGroup>
     <None Update="NLog.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>    
     </None>
   </ItemGroup>
   
-    <ItemGroup>
-      <Folder Include="Model\" />
-    </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Model\" />
+  </ItemGroup>
 
 </Project>

@@ -70,7 +70,7 @@ namespace CryptoTickerBot.Core.Exchanges
                 while (ws.State != WebSocketState.Closed)
                 {
                     if (UpTime > LastUpdateDuration &&
-                         LastUpdateDuration > TimeSpan.FromHours(1) ||
+                         LastUpdateDuration > TimeSpan.FromMinutes(15) ||
                          closed)
                     {
                         ws.Disconnect();

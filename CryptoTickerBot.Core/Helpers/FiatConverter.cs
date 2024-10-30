@@ -111,7 +111,7 @@ namespace CryptoTickerBot.Core.Helpers
         {
             //var json = await TickerUrl.GetStringAsync ( ).ConfigureAwait ( false );
             // Hardcoded response
-            var json = "{'success': true, 'timestamp': 1728382641, 'base': 'EUR', 'date': '2024-10-08', 'rates': {'ARS': 1051.076682,'EUR': 1,'USD': 1.118644}}";
+            var json = "{'success': true, 'timestamp': 1728382641, 'base': 'EUR', 'date': '2024-10-29', 'rates': {'ARS': 1051.076682,'EUR': 1,'USD': 1.118644}}";
             var data = JsonConvert.DeserializeObject<dynamic>(json);
             UsdTo =
                 JsonConvert.DeserializeObject<Dictionary<string, decimal>>(data.rates.ToString());
