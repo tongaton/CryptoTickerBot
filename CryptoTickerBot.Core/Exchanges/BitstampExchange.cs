@@ -26,7 +26,7 @@ namespace CryptoTickerBot.Core.Exchanges
         {
         }
 
-        protected override async Task FetchInitialDataAsync(CancellationToken ct)
+        protected override async Task StartAllKlineUpdates(CancellationToken ct)
         {
             Assets = await TradingPairsEndpoint
                 .GetJsonAsync<List<BitstampAsset>>(ct)

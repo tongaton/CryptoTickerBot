@@ -131,6 +131,9 @@ namespace CryptoTickerBot.Core.Abstractions
 
                 ExchangeData = new ConcurrentDictionary<string, CryptoCoin>();
                 await FetchInitialDataAsync(c).ConfigureAwait(false);
+                // Start calling klines
+                StartAllKlineUpdates(c).ConfigureAwait(false);
+                // Get Exchanged Data
                 await GetExchangeDataAsync(c).ConfigureAwait(false);
 
                 IsStarted = false;
@@ -211,11 +214,15 @@ namespace CryptoTickerBot.Core.Abstractions
                 : (coin, 1m / GetAdjustedBuyPrice(coin));
         }
 
+        protected virtual Task StartAllKlineUpdates(CancellationToken ct) =>
+            Task.CompletedTask;
         protected virtual Task FetchInitialDataAsync(CancellationToken ct) =>
+            Task.CompletedTask;
+        protected virtual Task GetKlinesAsync(string ticker, string kline, TimeSpan delay, CancellationToken ct) =>
             Task.CompletedTask;
 
         protected abstract Task GetExchangeDataAsync(CancellationToken ct);
-
+        
         protected virtual string CleanAndExtractSymbol(string symbol)
         {
             symbol = Regex.Replace(symbol, @"[\\\/-]", "");

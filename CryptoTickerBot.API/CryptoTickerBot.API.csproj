@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CryptoTickerBot.Core\CryptoTickerBot.Core.csproj" />
     <ProjectReference Include="..\CryptoTickerBot.Data\CryptoTickerBot.Data.csproj" />
   </ItemGroup>
 
@@ -27,6 +28,10 @@
     <Content Update="log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Remove="NLog.config" />
   </ItemGroup>
 
 </Project>

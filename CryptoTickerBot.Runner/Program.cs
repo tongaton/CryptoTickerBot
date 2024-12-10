@@ -1,4 +1,5 @@
 ﻿using Colorful;
+using CryptoTickerBot.Erky;
 using CryptoTickerBot.Core;
 using CryptoTickerBot.Core.Interfaces;
 using CryptoTickerBot.CUI;
@@ -6,9 +7,12 @@ using CryptoTickerBot.Data.Configs;
 using CryptoTickerBot.GoogleSheets;
 using CryptoTickerBot.Telegram;
 using NLog;
+using SystemHttpClient = System.Net.Http.HttpClient;
+using CoinbaseHttpClient = CoinbasePro.Network.HttpClient.HttpClient;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace CryptoTickerBot.Runner
 {
@@ -44,6 +48,9 @@ namespace CryptoTickerBot.Runner
             if (RunnerConfig.EnableTelegramService && HasExceptions<TelegramBotConfig>())
                 return false;
 
+            if (RunnerConfig.EnableErkyService && HasExceptions<ErkyConfig>())
+                return false;
+
             return true;
         }
 
@@ -66,6 +73,7 @@ namespace CryptoTickerBot.Runner
 
             await bot.StartAsync().ConfigureAwait(false);
 
+
             QuitEvent.WaitOne();
         }
 
@@ -79,8 +87,27 @@ namespace CryptoTickerBot.Runner
 
             if (RunnerConfig.EnableTelegramService)
                 await AttachTelegramServiceAsync(bot).ConfigureAwait(false);
+
+            if (RunnerConfig.EnableErkyService)
+                await AttachErkyServiceAsync(bot).ConfigureAwait(false);
         }
 
+        private static async Task AttachErkyServiceAsync(IBot bot)
+        {
+            var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+            };
+            var httpClient = new SystemHttpClient(handler);
+            var erkyService = new ErkyService(ConfigManager<ErkyConfig>.Instance, httpClient);
+
+            erkyService.Update += updaterService =>
+            {
+                Logger.Debug($"Erky Updated @ {erkyService.LastUpdate}");
+                return Task.CompletedTask;
+            };
+            await bot.AttachAsync(erkyService).ConfigureAwait(false);
+        }
         private static async Task AttachTelegramServiceAsync(IBot bot)
         {
             var teleService = new TelegramBotService(ConfigManager<TelegramBotConfig>.Instance);

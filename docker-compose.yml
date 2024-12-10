@@ -1,12 +1,37 @@
-version: '3.4'
+version: '3.9'
+
+# IMPORTANT!!!
+# You must create a local developer certificate using:
+#
+# 1) Clean Previous certificate
+# dotnet dev-certs https --clean
+#
+# 2) Create in AppData folder the certificate with a password
+# dotnet dev-certs https -ep $APPDATA%\ASP.NET\Https\aspnetapp.pfx -p ErkyBot2024
+#
+# 3) Trust the signed certificate
+# dotnet dev-certs https --trust
+
 
 services:
   cryptotickerbot.api:
-    image: cryptotickerbot-api
     build:
       context: CryptoTickerBot.API
-      dockerfile: ./Dockerfile
-    environment:
-      NODE_ENV: production
+      dockerfile: Dockerfile_API
+    container_name: cryptotickerbot.api
     ports:
-      - 3000:3000
+      - "80:443"
+    environment:
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=ErkyBot2024
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/https/aspnetapp.pfx
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/app/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/app/https:ro
+
+#   Build the image
+#     docker build -t cryptotickerbot.api .
+#   Run the container
+#     docker run -d -p 3000:3443 --name erky-api cryptotickerbot.api .
+#   Test the docker
+#     docker logs -f <container_id> .

@@ -49,7 +49,7 @@ namespace CryptoTickerBot.API
             });
 
             services.AddDbContext<CryptoTickerContext>(options => options.UseSqlServer(Configuration.GetConnectionString("CryptoTicker"), providerOptions => providerOptions.EnableRetryOnFailure()));
-
+                        
             services.AddControllers(
                 options =>
                     options.Filters.Add(new HttpResponseExceptionFilter())

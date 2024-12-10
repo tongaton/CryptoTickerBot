@@ -14,6 +14,7 @@ namespace CryptoTickerBot.Runner
         public bool EnableConsoleService { get; set; } = false;
         public bool EnableGoogleSheetsService { get; set; } = true;
         public bool EnableTelegramService { get; set; } = true;
+        public bool EnableErkyService { get; set; } = true;
 
         public bool TryValidate(out IList<Exception> exceptions)
         {

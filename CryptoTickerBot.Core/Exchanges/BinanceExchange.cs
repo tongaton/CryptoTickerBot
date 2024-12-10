@@ -1,4 +1,5 @@
-﻿using CryptoTickerBot.Core.Abstractions;
+﻿using CoinbasePro.WebSocket.Models.Response;
+using CryptoTickerBot.Core.Abstractions;
 using CryptoTickerBot.Data.Domain;
 using Flurl.Http;
 using Newtonsoft.Json;
@@ -16,8 +17,11 @@ namespace CryptoTickerBot.Core.Exchanges
     {
         public const string RestBaseEndpoint = "https://api.binance.com";
         public const string RestTickerEndpoint = "/api/v1/ticker/24hr";
+        public const string RestKlinesEndpoint = "/api/v3/klines";
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        private readonly Dictionary<string, Task> _klineTasks;
 
         public BinanceExchange() : base(CryptoExchangeId.Binance)
         {
@@ -33,7 +37,14 @@ namespace CryptoTickerBot.Core.Exchanges
                     .ConfigureAwait(false);
 
                 foreach (var datum in data)
+                {
                     Update(datum, datum.Symbol);
+
+                    //if (HasKlineMapped(datum.Symbol))
+                    //    await GetKlinesAsync(datum.Symbol, "15m", TimeSpan.FromHours(1), ct).ConfigureAwait(false);
+
+                }
+
             }
             catch (Exception e)
             {
@@ -41,6 +52,73 @@ namespace CryptoTickerBot.Core.Exchanges
             }
         }
 
+        protected override async Task StartAllKlineUpdates(CancellationToken ct)
+        {
+            
+            var _klineTasks = new Dictionary<string, Task>();
+
+            // Define different intervals and their delays (in minutes)
+            var klineIntervals = new Dictionary<string, TimeSpan>
+            {
+                { "15m", TimeSpan.FromMinutes(15) },
+                { "1h", TimeSpan.FromHours(1) },
+                { "4h", TimeSpan.FromHours(4) },
+                { "1d", TimeSpan.FromDays(1) }
+            };
+
+            foreach (var klineInterval in klineIntervals)
+            {
+                // For each kline value, start a task with the specified delay
+                var kline = klineInterval.Key;
+                var delay = klineInterval.Value;
+                // Create a new task for each kline value and start it
+                foreach (var ticker in SymbolMappings)
+                {
+                    string symbol = ticker.Key;
+                    string mappedValue = ticker.Value;
+
+                    var task = GetKlinesAsync(symbol, kline, delay, ct);
+
+                    _klineTasks[kline] = task; // Store the task if you need to manage it later
+
+                }
+
+            }
+        }
+
+        protected override async Task GetKlinesAsync(string ticker, string kline, TimeSpan delay,
+                                        CancellationToken ct)
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                try
+                {
+                    // Retrieve last time for the kline
+                    var startTime = DateTimeOffset.UtcNow.Subtract(TimeSpan.FromHours(12)).ToUnixTimeMilliseconds();
+                    var klinesUrl = $"{RestBaseEndpoint}{RestKlinesEndpoint}";
+                        klinesUrl += $"?interval={kline}";
+                        klinesUrl += $"&startTime={startTime}";
+                        klinesUrl += "&timeZone=-3";
+                        klinesUrl += $"&symbol={ticker}";
+
+                    var data = await $"{klinesUrl}"
+                        .GetJsonAsync<List<object>>(ct)
+                        .ConfigureAwait(false);
+
+                    //analyze all klines
+                    // KlineTickerDatum
+
+                    // Wait for next run
+                    await Task.Delay(delay, ct).ConfigureAwait(false);
+
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e);
+                }
+            }
+
+        }
         protected override async Task GetExchangeDataAsync(CancellationToken ct)
         {
             var options = new PureWebSocketOptions
@@ -88,6 +166,13 @@ namespace CryptoTickerBot.Core.Exchanges
             ExchangeData[id].LowestAsk = datum.BestAskPrice;
             ExchangeData[id].HighestBid = datum.BestBidPrice;
             ExchangeData[id].Rate = datum.Close;
+        }
+        private bool HasKlineMapped(string symbol)
+        {
+            if (SymbolMappings.ContainsKey(symbol))
+                return true;
+            else
+                return false;
         }
 
         private void WsOnMessage(string json)
@@ -243,6 +328,25 @@ namespace CryptoTickerBot.Core.Exchanges
 
             [JsonProperty("n")]
             public long NumberOfTrades { get; set; }
+        }
+
+        public class KlineTickerDatum : ITickerDatum
+        {
+            public string Symbol { get; set; }
+            public long OpenTime { get; set; } // Position 0: Open time in milliseconds since Unix epoch
+            public decimal OpenPrice { get; set; } // Position 1: Open price
+            public decimal HighPrice { get; set; } // Position 2: High price
+            public decimal LowPrice { get; set; } // Position 3: Low price
+            public decimal Close { get; set; } // Position 4: Close price
+            public decimal Volume { get; set; } // Position 5: Volume
+            public long CloseTime { get; set; } // Position 6: Close time in milliseconds since Unix epoch
+            public decimal QuoteAssetVolume { get; set; } // Position 7: Quote asset volume
+            public int NumberOfTrades { get; set; } // Position 8: Number of trades
+            public decimal TakerBuyBaseAssetVolume { get; set; } // Position 9: Taker buy base asset volume
+            public decimal TakerBuyQuoteAssetVolume { get; set; } // Position 10: Taker buy quote asset volume
+            public string Ignore { get; set; } // Position 11: Ignore (always "0")
+            public decimal BestBidPrice { get; set; }
+            public decimal BestAskPrice { get; set; }
         }
     }
 }

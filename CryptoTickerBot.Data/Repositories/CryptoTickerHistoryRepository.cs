@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static CryptoTickerBot.Data.Helpers.DbQueryReader;
@@ -30,6 +31,21 @@ namespace CryptoTickerBot.Data.Repositories
             List<CryptoTicker> tickerList = await _cryptoTickerContext.CryptoTickerHistory.FromSqlRaw(query).ToListAsync();
 
             return tickerList;
+        }
+        public async Task<CryptoTicker> GetLastTickerHistory(string ticker, string klines)
+        {
+            string query = DbQueryReader.GetInstance().GetQuery(Enum.GetName(typeof(DbNames), DbNames.Erky), ErkyQueryReference.TICKER, ErkyQueryReference.GET_LAST_TICKER_HISTORY);
+
+            //
+
+            List<CryptoTicker> lastTicker = await _cryptoTickerContext.CryptoTickerHistory.FromSqlRaw(query,
+                        new SqlParameter[] {
+                            new SqlParameter("@ticker", ticker),
+                            new SqlParameter("@klines", klines) })
+                    .ToListAsync();
+
+            return lastTicker.FirstOrDefault();
+
         }
         public async Task<List<CryptoTicker>> GetTickerHistories(DateTime fromDate, DateTime toDate, string ticker, string klines)
         {

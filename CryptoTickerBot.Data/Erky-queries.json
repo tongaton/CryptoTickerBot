@@ -5,6 +5,10 @@
       "QueryString": "exec ps_get_ticker_history_list @date_from, @date_to, @ticker, @klines"
     },
     {
+      "QueryName": "GET_LAST_TICKER_HISTORY",
+      "QueryString": "exec ps_get_last_ticker_history @ticker, @klines"
+    },
+    {
       "QueryName": "INSERT_OR_UPDATE_TICKER_HISTORY",
       "QueryString": "exec pui_ticker_history @timestamp, @ticker, @klines, @price"
     },

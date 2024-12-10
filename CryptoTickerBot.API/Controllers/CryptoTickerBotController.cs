@@ -45,6 +45,22 @@ namespace CryptoTickerBot.API.Controllers
             }
 
         }
+        
+        [HttpGet]
+        public async Task<CryptoTicker> GetLastTickerHistory(string ticker, string klines)
+        {
+            try
+            {
+                CryptoTicker cryptoHistory = await CryptoTickerHistoryRepository.GetLastTickerHistory(ticker, klines);
+
+                return cryptoHistory;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while getting Last Ticket History");
+                throw ex;
+            }
+        }
 
         [HttpPost]
         public async Task InsertOrUpdateTickerHistory(DateTime timestamp, string ticker, string klines, decimal price)
