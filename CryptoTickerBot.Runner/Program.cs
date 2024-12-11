@@ -7,12 +7,11 @@ using CryptoTickerBot.Data.Configs;
 using CryptoTickerBot.GoogleSheets;
 using CryptoTickerBot.Telegram;
 using NLog;
-using SystemHttpClient = System.Net.Http.HttpClient;
-using CoinbaseHttpClient = CoinbasePro.Network.HttpClient.HttpClient;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
+using SystemHttpClient = System.Net.Http.HttpClient;
 
 namespace CryptoTickerBot.Runner
 {
@@ -72,7 +71,6 @@ namespace CryptoTickerBot.Runner
             await AttachServicesAsync(bot).ConfigureAwait(false);
 
             await bot.StartAsync().ConfigureAwait(false);
-
 
             QuitEvent.WaitOne();
         }

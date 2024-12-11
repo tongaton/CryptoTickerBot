@@ -49,8 +49,6 @@ namespace CryptoTickerBot.Erky
             {
                 if (ErkyConfig.ErkyMappings.ContainsValue(coin.Symbol))
                 {
-                    //Console.WriteLine($"{coin.Symbol} exists as a value in SymbolMappings.");
-
                     var erkyURL = $"{ErkyConfig.InternalAPI}{ErkyConfig.InsertOrUpdateEndpoint}";
                         erkyURL += "?timestamp=" + coin.Time.ToString("yyyy/MM/dd HH:mm:ss");
                         erkyURL += "&ticker=" + coin.Symbol;

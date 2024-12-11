@@ -123,22 +123,32 @@ namespace CryptoTickerBot.Core.Abstractions
             cts = new CancellationTokenSource();
             cts = CancellationTokenSource.CreateLinkedTokenSource(token ?? CancellationToken.None, cts.Token);
 
-            await Policy.ExecuteAsync(async c =>
+            try { 
+                await Policy.ExecuteAsync(async c =>
+                {
+                    StartTime = DateTime.UtcNow;
+                    IsStarted = true;
+                    Logger.Debug($"Starting {Name,-12} receiver.");
+
+                    ExchangeData = new ConcurrentDictionary<string, CryptoCoin>();
+                    //await FetchInitialDataAsync(c).ConfigureAwait(false);
+                    // Start calling klines
+                    await StartAllKlineUpdates(c).ConfigureAwait(false);
+                    // Get Exchanged Data
+                    await GetExchangeDataAsync(c).ConfigureAwait(false);
+
+                    IsStarted = false;
+                    Logger.Debug($"{Name,-12} receiver terminated.");
+                }, cts.Token).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
             {
-                StartTime = DateTime.UtcNow;
-                IsStarted = true;
-                Logger.Debug($"Starting {Name,-12} receiver.");
-
-                ExchangeData = new ConcurrentDictionary<string, CryptoCoin>();
-                await FetchInitialDataAsync(c).ConfigureAwait(false);
-                // Start calling klines
-                StartAllKlineUpdates(c).ConfigureAwait(false);
-                // Get Exchanged Data
-                await GetExchangeDataAsync(c).ConfigureAwait(false);
-
-                IsStarted = false;
-                Logger.Debug($"{Name,-12} receiver terminated.");
-            }, cts.Token).ConfigureAwait(false);
+                Console.WriteLine("Delay was canceled.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected error: {ex.Message}");
+            }
         }
 
         public virtual async Task StopReceivingAsync()
@@ -218,7 +228,9 @@ namespace CryptoTickerBot.Core.Abstractions
             Task.CompletedTask;
         protected virtual Task FetchInitialDataAsync(CancellationToken ct) =>
             Task.CompletedTask;
-        protected virtual Task GetKlinesAsync(string ticker, string kline, TimeSpan delay, CancellationToken ct) =>
+        protected virtual Task GetAllKlinesAsync(string kline, TimeSpan delay, CancellationToken ct) =>
+            Task.CompletedTask;
+        protected virtual Task GetKlinesAsync(string ticker, string kline, CancellationToken ct) =>
             Task.CompletedTask;
 
         protected abstract Task GetExchangeDataAsync(CancellationToken ct);

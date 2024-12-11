@@ -1,7 +1,8 @@
-﻿using CoinbasePro.WebSocket.Models.Response;
-using CryptoTickerBot.Core.Abstractions;
+﻿using CryptoTickerBot.Core.Abstractions;
 using CryptoTickerBot.Data.Domain;
 using Flurl.Http;
+using Humanizer;
+using Humanizer.Localisation;
 using Newtonsoft.Json;
 using NLog;
 using PureWebSockets;
@@ -10,6 +11,9 @@ using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Humanizer;
+using Humanizer.Localisation;
+using CoinbasePro.Services.Products.Models;
 
 namespace CryptoTickerBot.Core.Exchanges
 {
@@ -39,10 +43,6 @@ namespace CryptoTickerBot.Core.Exchanges
                 foreach (var datum in data)
                 {
                     Update(datum, datum.Symbol);
-
-                    //if (HasKlineMapped(datum.Symbol))
-                    //    await GetKlinesAsync(datum.Symbol, "15m", TimeSpan.FromHours(1), ct).ConfigureAwait(false);
-
                 }
 
             }
@@ -54,10 +54,6 @@ namespace CryptoTickerBot.Core.Exchanges
 
         protected override async Task StartAllKlineUpdates(CancellationToken ct)
         {
-            
-            var _klineTasks = new Dictionary<string, Task>();
-
-            // Define different intervals and their delays (in minutes)
             var klineIntervals = new Dictionary<string, TimeSpan>
             {
                 { "15m", TimeSpan.FromMinutes(15) },
@@ -66,58 +62,93 @@ namespace CryptoTickerBot.Core.Exchanges
                 { "1d", TimeSpan.FromDays(1) }
             };
 
+            var tasks = new List<Task>();
+
             foreach (var klineInterval in klineIntervals)
             {
-                // For each kline value, start a task with the specified delay
                 var kline = klineInterval.Key;
                 var delay = klineInterval.Value;
-                // Create a new task for each kline value and start it
-                foreach (var ticker in SymbolMappings)
-                {
-                    string symbol = ticker.Key;
-                    string mappedValue = ticker.Value;
 
-                    var task = GetKlinesAsync(symbol, kline, delay, ct);
+                // Start a separate task for this interval
+                tasks.Add(Task.Run(async () =>
+                      await GetAllKlinesAsync(kline, delay, ct)  
+                    , ct));
+            }
 
-                    _klineTasks[kline] = task; // Store the task if you need to manage it later
-
-                }
-
+            try
+            {
+                // Wait for all kline tasks to complete
+                await Task.WhenAll(tasks).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine("All kline updates canceled.");
             }
         }
 
-        protected override async Task GetKlinesAsync(string ticker, string kline, TimeSpan delay,
-                                        CancellationToken ct)
+        protected override async Task GetAllKlinesAsync(string kline, TimeSpan delay, CancellationToken ct)
         {
             while (!ct.IsCancellationRequested)
             {
                 try
                 {
-                    // Retrieve last time for the kline
-                    var startTime = DateTimeOffset.UtcNow.Subtract(TimeSpan.FromHours(12)).ToUnixTimeMilliseconds();
-                    var klinesUrl = $"{RestBaseEndpoint}{RestKlinesEndpoint}";
-                        klinesUrl += $"?interval={kline}";
-                        klinesUrl += $"&startTime={startTime}";
-                        klinesUrl += "&timeZone=-3";
-                        klinesUrl += $"&symbol={ticker}";
+                    foreach (var ticker in SymbolMappings)
+                    {
+                        string symbol = ticker.Key;
+                        string mappedValue = ticker.Value;
 
-                    var data = await $"{klinesUrl}"
-                        .GetJsonAsync<List<object>>(ct)
-                        .ConfigureAwait(false);
+                        Console.WriteLine($"[{DateTime.UtcNow:dddd, yyyy-MM-dd HH:mm:ss}] Updating {symbol} on kline {kline}.");
 
-                    //analyze all klines
-                    // KlineTickerDatum
+                        // Run the kline update task
+                        await GetKlinesAsync(symbol, kline, ct).ConfigureAwait(false);
+                    }
 
-                    // Wait for next run
-                    await Task.Delay(delay, ct).ConfigureAwait(false);
-
+                    // Delay until the next update for this interval
+                    if (!ct.IsCancellationRequested)
+                    {
+                        await Task.Delay(delay, ct).ConfigureAwait(false);
+                    }
                 }
-                catch (Exception e)
+                catch (OperationCanceledException)
                 {
-                    Logger.Error(e);
+                    Console.WriteLine($"Cancellation requested for {kline} updates.");
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Unexpected error in {kline} updates: {ex.Message}");
                 }
             }
 
+        }
+        protected override async Task GetKlinesAsync(string ticker, string kline, CancellationToken ct)
+        {
+            try
+            {
+                // Retrieve last time for the kline
+                var startTime = DateTimeOffset.UtcNow.Subtract(TimeSpan.FromHours(12)).ToUnixTimeMilliseconds();
+                var klinesUrl = $"{RestBaseEndpoint}{RestKlinesEndpoint}";
+                    klinesUrl += $"?interval={kline}";
+                    klinesUrl += $"&startTime={startTime}";
+                    klinesUrl += "&timeZone=-3";
+                    klinesUrl += $"&symbol={ticker}";
+
+                var data = await $"{klinesUrl}"
+                    .GetJsonAsync<List<object>>(ct)
+                    .ConfigureAwait(false);
+
+                //analyze all klines
+                // KlineTickerDatum
+
+            }
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine("Delay was canceled.");
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e);
+            }
         }
         protected override async Task GetExchangeDataAsync(CancellationToken ct)
         {
